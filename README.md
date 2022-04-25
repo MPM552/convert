@@ -8,5 +8,10 @@ Unit Conversion Program
 
 Access the main project page at localhost:8000/cgi-bin/convert.cgi in your browser of choice
 
+For help installing Singularity:
+  https://sylabs.io/guides/3.5/user-guide/quick_start.html
+  
+Note: This is a difficult process on non-Linux machines
+
 
 
