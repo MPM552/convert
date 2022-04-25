@@ -8,6 +8,10 @@ Unit Conversion Program
 
 Access the main project page at localhost:8000/cgi-bin/convert.cgi in your browser of choice
 
+convert.cgi currently has a divide by zero error that is apparent when building the container.
+
+However, it will run locally using the one-line python server and necessary dependencies.
+
 For help installing Singularity:
   https://sylabs.io/guides/3.5/user-guide/quick_start.html
   
