@@ -1,0 +1,26 @@
+Bootstrap: docker
+From: ubuntu:16.04
+
+%environment
+	export LC_ALL=C
+
+%post
+	apt update
+	apt install sudo
+	apt install -y python3-pip
+	sudo apt-get install -y perl
+        sudo apt-get install -y cpanminus
+        sudo apt-get install -y build-essential
+	cpan Data::Dumper LWP::UserAgent LWP::ConnCache CGI HTML::Template
+
+%runscript
+	python3 -m http.server --bind localhost --cgi 8000 &
+	bash
+%test
+    grep -q NAME=\"Ubuntu\" /etc/os-release
+    if [ $? -eq 0 ]; then
+        echo "Container base is Ubuntu as expected."
+    else
+        echo "Container base is not Ubuntu."
+        exit 1
+    fi

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>converter</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<TMPL_IF NAME="query">
+<TMPL_ELSE>
+<script type="text/javascript">
+// <!--
+
+function insert(code) {
+	// console.log("inserting " + code);
+	document.getElementById('unitDropdown').style.visibility = 'hidden';
+	var text = document.getElementById('text');
+	var value = text.value;
+	var pad = value.match(/ $/) ? '' : ' ';
+	// The following isn't standard DOM.
+	// text.value = value.substr(0, selectionStart) + ' ' + code + value(selectionStart);
+	text.value += pad + code;
+} // insert
+
+// -->
+</script>
+</TMPL_IF> <!-- not query -->
+
+<style type="text/css">
+	pre, textarea {
+		font-family: "Courier", monospace;
+		font-size: 100%; 
+		font-weight: bold;
+	}
+	h1 {
+		font-size: 300%;
+		text-align: center;
+	}
+	.dropdown {
+		display: inline-block;
+	}
+	.input {
+		color: blue;
+	}
+
+	/* { the following are from
+	 * https://bootsnipp.com/snippets/featured/multi-level-dropdown-menu-bs3
+	*/
+	.dropdown-submenu {
+		position: relative;
+	}
+
+	.dropdown-submenu>.dropdown-menu {
+		top: 0;
+		left: 100%;
+		margin-top: -6px;
+		margin-left: -1px;
+		-webkit-border-radius: 0 6px 6px 6px;
+		-moz-border-radius: 0 6px 6px;
+		border-radius: 0 6px 6px 6px;
+	}
+
+	.dropdown-submenu:hover>.dropdown-menu {
+		display: block;
+	}
+
+	.dropdown-submenu>a:after {
+		display: block;
+		content: " ";
+		float: right;
+		width: 0;
+		height: 0;
+		border-color: transparent;
+		border-style: solid;
+		border-width: 5px 0 5px 5px;
+		border-left-color: #ccc;
+		margin-top: 5px;
+		margin-right: -10px;
+	}
+
+	.dropdown-submenu:hover>a:after {
+		border-left-color: #fff;
+	}
+
+	.dropdown-submenu.pull-left {
+		float: none;
+	}
+
+	.dropdown-submenu.pull-left>.dropdown-menu {
+		left: -100%;
+		margin-left: 10px;
+		-webkit-border-radius: 6px 0 6px 6px;
+		-moz-border-radius: 6px 0 6px 6px;
+		border-radius: 6px 0 6px 6px;
+	}
+
+	/* } */
+
+</style>
+
+
+</head>
+<body>
+<h1>Unit converter and calculator</h1>
+
+<div class="container">
+
+<TMPL_IF NAME="query">
+<h3>Result</h3>
+<pre><TMPL_VAR NAME='result'></pre>
+
+<TMPL_ELSE>
+
+<!-- menus -->
+This button helps if you can't remember an abbreviation. 
+<div class="dropdown">
+<button class="btn btn-sm btn-primary dropdown-toggle" type="button"
+	data-toggle="dropdown" id="dimensions" >
+category
+<span class="caret"></span>
+</button>
+<ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dimensions">
+<TMPL_LOOP NAME="dimensions">
+	<li class="dropdown-submenu">
+		<a href='#' tabindex='-1'><TMPL_VAR NAME="dimension"></a>
+		<ul class="dropdown-menu">
+			<TMPL_LOOP NAME="entry">
+			<li onclick="insert('<TMPL_VAR NAME="unit">');">
+				<a href='#'><TMPL_VAR NAME="longName"></a>
+			</li>
+			</TMPL_LOOP>
+		</ul>
+	</li>
+</TMPL_LOOP>
+</ul>
+</div>
+
+<div class="dropdown" style="visibility:hidden;" id="unitDropdown">
+<button class="btn btn-sm btn-info dropdown-toggle" type="button"
+	data-toggle="dropdown" id="units" >
+unit
+<span class="caret"></span>
+</button>
+<ul class="dropdown-menu col-xs-12" role="menu" aria-labelledby="units" id="unitContent">
+</ul>
+</div>
+
+
+<form
+action='convert.cgi'
+method='post' enctype='multipart/form-data'>
+	Enter your conversion requests here:<br/><textarea
+	id='text' name='text' cols='80' rows='10' onmouseover='this.focus()'></textarea>
+	<br/>
+	<input type='submit' value='execute'
+		style='background-color:#AAFFAA;'/>
+	<input type='reset' value='reset'
+		style='background-color:#FFAAAA;'/>
+</form>
+
+<h3>Credits</h3>
+
+<pre>
+Programmed by Raphael Finkel.
+A student team, including Seifalla Moustafa, Ronnel Turner, and Clay Marshall
+suggested currency-conversion code, abbreviation menus, and dimension display.
+Currency conversion provided by <a href='http://www.exchangerate-api.com'>www.exchangerate-api.com</a>.
+</pre>
+
+<h3>Instructions</h3>
+<pre>
+Input is line-oriented.
+Valid forms:
+	expression, such as <span class='input'>12 m / day</span> 
+	assignment, such as <span class='input'>snailPace = 12 m / day</span>
+	conversion request, such as <span class='input'>convert snailPace to km / hr</span>
+	dimension request, such as <span class='input'>dim snailPace</span>
+Expression details:
+	disallowed: function symbols
+	allowed: implicit multiplication
+	allowed: unary negation
+	allowed: exponentiation (with ^) to any integer (including negative).
+	allowed: decimal numbers
+	disallowed: exponential (e) notation.
+Comments start with % and continue to the end of the line.
+You may prefix constants and variables with multipliers: 
+	P peta-
+	T tera-
+	G giga-
+	M mega-
+	k kilo-
+	h hecto-
+	d deci-
+	c centi-
+	m milli-
+	μ micro-
+	n nano-
+	p pico-
+	f femto-
+</pre>
+
+<h4>Predefined constants</h4>
+<pre>
+<TMPL_LOOP NAME="constants">
+	<TMPL_VAR name="entry"></TMPL_LOOP>
+</pre>
+</TMPL_IF>
+
+</div> <!-- outermost container -->
+</body>
+</html>
+<!-- vim:filetype=html
+-->
